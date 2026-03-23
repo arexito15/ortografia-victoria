@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ortografía PRO 50</title>
+<style>
+body{font-family:Arial;background:linear-gradient(135deg,#667eea,#764ba2);padding:20px}
+.container{background:white;padding:20px;border-radius:15px;max-width:950px;margin:auto}
+h1{text-align:center}
+.word{margin:12px 0;font-size:20px}
+
+input{
+  width:26px;
+  height:34px;
+  text-align:center;
+  font-size:18px;
+  vertical-align:middle;
+}
+
+.tilde{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  margin:0 3px;
+  vertical-align:middle;
+  transform:translateY(-8px);
+}
+
+.tilde-text{
+  font-size:10px;
+  margin-bottom:1px;
+  transform:translateY(-8px);
+}
+
+.tilde input[type="checkbox"]{
+  width:12px;
+  height:12px;
+  transform:translateY(-10px);
+  margin-bottom:1px;
+}
+
+.correct{background:#c8f7c5}
+.wrong{background:#f7c5c5}
+button{padding:10px;margin:10px;border:none;border-radius:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Ortografía PRO (50 oraciones)</h1>
+<div id="quiz"></div>
+<button onclick="check()">Revisar</button>
+<button onclick="answers()">Respuestas</button>
+<h2 id="score"></h2>
+</div>
+
+<script>
+
+const q = [
+{t:"La _aca come pa_o.",a:["v","s"],tilde:[false,false]},
+{t:"El ni_o comi_ pan.",a:["ñ","ó"],tilde:[false,true]},
+{t:"Mi pap_ trabaj_ mucho.",a:["á","ó"],tilde:[true,true]},
+{t:"El cami_n pasa r_pido.",a:["ó","á"],tilde:[true,true]},
+{t:"La canci_n es bonita.",a:["ó"],tilde:[true]},
+{t:"El _iento sopla.",a:["v"],tilde:[false]},
+{t:"La me_a está limpia.",a:["s"],tilde:[false]},
+{t:"El pe_ nada.",a:["z"],tilde:[false]},
+{t:"La _icicleta es nueva.",a:["b"],tilde:[false]},
+{t:"El ar_ol es grande.",a:["b"],tilde:[true]},
+{t:"El sof_ es cómodo.",a:["á"],tilde:[true]},
+{t:"La mam_ cocin_ arroz.",a:["á","ó"],tilde:[true,true]},
+{t:"El la_iz es azul.",a:["p"],tilde:[false]},
+{t:"La ta_a está llena.",a:["s"],tilde:[false]},
+{t:"El pa_aro canta.",a:["j"],tilde:[false]},
+{t:"La ca_a es bonita.",a:["s"],tilde:[false]},
+{t:"El _arco navega.",a:["b"],tilde:[false]},
+{t:"La _entana está abierta.",a:["v"],tilde:[false]},
+{t:"El niño escri_e.",a:["b"],tilde:[false]},
+{t:"La _ida es rica.",a:["v"],tilde:[false]},
+{t:"El ca_allo corre.",a:["b"],tilde:[false]},
+{t:"La me_a está sucia.",a:["s"],tilde:[false]},
+{t:"El pa_que es grande.",a:["r"],tilde:[false]},
+{t:"El ar_ol crece.",a:["b"],tilde:[true]},
+{t:"La mam_ camin_ despacio.",a:["á","ó"],tilde:[true,true]},
+{t:"El ni_o jug_ fútbol.",a:["ñ","ó"],tilde:[false,true]},
+{t:"La _aca da leche.",a:["v"],tilde:[false]},
+{t:"El _iento mueve hojas.",a:["v"],tilde:[false]},
+{t:"La _ida es deliciosa.",a:["v"],tilde:[false]},
+{t:"El ca_allo salta.",a:["b"],tilde:[false]},
+{t:"La me_a es grande.",a:["s"],tilde:[false]},
+{t:"El pa_aro vuela.",a:["j"],tilde:[false]},
+{t:"La ca_a tiene flores.",a:["s"],tilde:[false]},
+{t:"El _arco es rápido.",a:["b"],tilde:[false]},
+{t:"La _entana tiene polvo.",a:["v"],tilde:[false]},
+{t:"El niño come azú_ar.",a:["c"],tilde:[false]},
+{t:"La _ida está caliente.",a:["v"],tilde:[false]},
+{t:"El ca_allo es veloz.",a:["b"],tilde:[false]},
+{t:"La me_a está limpia.",a:["s"],tilde:[false]},
+{t:"El pa_aro canta alto.",a:["j"],tilde:[false]},
+{t:"La ca_a está lejos.",a:["s"],tilde:[false]},
+{t:"El _arco cruza.",a:["b"],tilde:[false]},
+{t:"La _entana está cerrada.",a:["v"],tilde:[false]},
+{t:"El niño escri_e bien.",a:["b"],tilde:[false]},
+{t:"La _ida es sabrosa.",a:["v"],tilde:[false]},
+{t:"El ca_allo corre rápido.",a:["b"],tilde:[false]},
+{t:"La me_a está limpia.",a:["s"],tilde:[false]},
+{t:"El pa_aro vuela alto.",a:["j"],tilde:[false]},
+{t:"La ca_a es bonita.",a:["s"],tilde:[false]}
+];
+
+const quiz=document.getElementById("quiz");
+
+q.forEach((item,i)=>{
+let div=document.createElement("div");
+div.className="word";
+let parts=item.t.split("_");
+
+parts.forEach((p,j)=>{
+div.innerHTML+=p;
+if(j<item.a.length){
+
+if(item.tilde[j]){
+div.innerHTML+=`<span class="tilde">
+<span class="tilde-text">tilde</span>
+<input type="checkbox" id="t${i}_${j}">
+<input id="q${i}_${j}">
+</span>`;
+}else{
+div.innerHTML+=`<input id="q${i}_${j}">`;
+}
+
+}
+});
+
+quiz.appendChild(div);
+});
+
+function check(){
+let score=0,total=0;
+q.forEach((item,i)=>{
+item.a.forEach((a,j)=>{
+total++;
+let input=document.getElementById(`q${i}_${j}`);
+let val=input.value.toLowerCase();
+
+let tildeOK=true;
+if(item.tilde[j]){
+let chk=document.getElementById(`t${i}_${j}`).checked;
+if(!chk) tildeOK=false;
+}
+
+if(val==a && tildeOK){
+input.className="correct";
+score++;
+}else{
+input.className="wrong";
+}
+});
+});
+
+document.getElementById("score").innerText="Puntaje: "+score+"/"+total;
+}
+
+function answers(){
+q.forEach((item,i)=>{
+item.a.forEach((a,j)=>{
+document.getElementById(`q${i}_${j}`).value=a;
+if(item.tilde[j]) document.getElementById(`t${i}_${j}`).checked=true;
+});
+});
+}
+
+</script>
+</body>
+</html>
